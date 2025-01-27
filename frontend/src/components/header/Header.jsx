@@ -5,6 +5,7 @@ import {
   History,
   Home,
   ThumbsUp,
+  TvMinimalPlay,
   VideotapeIcon,
 } from "lucide-react";
 
@@ -18,7 +19,7 @@ const Header = () => {
 
   return (
     <>
-    <div className="flex w-full fixed justify-between bg-white p-2 pl-10 pr-10 screen-max-9:pl-0 screen-max-9:pr-0 shadow-lg screen-max-7:flex-col screen-max-7:items-center screen-max-9:justify-center screen-max-9:gap-5">
+    <div className="flex w-full fixed justify-between bg-white p-2 pl-10 pr-10 screen-max-9:pl-0 screen-max-9:pr-0  screen-max-7:flex-col screen-max-7:items-center screen-max-9:justify-center screen-max-9:gap-5">
         {/* icon and hamburger */}
 
         <div className="flex gap-10 screen-max-9:gap-6">
@@ -52,20 +53,20 @@ const Header = () => {
 
         {/* conditional rendering signin button & icons */}
         <div className="flex gap-7 screen-max-9:gap-4 mt-3">
-          <FaVideo className="w-5 h-5" />
-          <FaRegBell className="w-5 h-5" />
-          <h1 className="rounded-full border border-black bg-blue-500 text-white p-1 -mt-1 ">
+          <FaVideo className="w-5 h-5 transition-transform duration-300 hover:scale-110 " />
+          <FaRegBell className="w-5 h-5 transition-transform duration-300 hover:scale-110" />
+          <h1 className="rounded-full border border-black bg-blue-500 text-white p-1 -mt-1 transition-transform duration-300 hover:scale-110">
             user
           </h1>
         </div>
       </div>
-
     
       <Sidebar isOpenHandler={isOpenHandler} isVisible={isOpen}>
-        <SidebarItem icon={<Home />} text="Home" active={true} />
-        <SidebarItem icon={<VideotapeIcon />} text="Your Videos" />
-        <SidebarItem icon={<History />} text="History" />
-        <SidebarItem icon={<ThumbsUp />} text="Liked" />
+        <SidebarItem icon={<Home />} text="Home" isVisible={isOpen}/>
+        <SidebarItem icon={<VideotapeIcon />} text="Your Videos" isVisible={isOpen}/>
+        <SidebarItem icon={<TvMinimalPlay />} text="Subscribed Channel" isVisible={isOpen}/>
+        <SidebarItem icon={<History />} text="History" isVisible={isOpen}/>
+        <SidebarItem icon={<ThumbsUp />} text="Liked" isVisible={isOpen}/>
       </Sidebar>
     </>
   );
