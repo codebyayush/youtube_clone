@@ -1,9 +1,10 @@
 import { Router } from "express";
+import { fetchDataFromYoutubeAndPushToDb, deleteAllVideosAndComments } from "../controllers/video.js";
 
 const router = Router();
 
-router.route("/").get((req, res) => {
-    
-})
+router.route("/fetchAndPushVideos").get(fetchDataFromYoutubeAndPushToDb)
 
-export default router
+router.route("/fetchAndPushVideos").delete( deleteAllVideosAndComments );
+
+export default router;

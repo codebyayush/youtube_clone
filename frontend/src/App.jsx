@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Header from './components/header/Header'
 import ChannelPage from './components/channel-page/ChannelPage'
 import Home from './components/home/Home'
-import Sidebar from './components/sidebar/Sidebar'
+import Auth from './components/authentication/Auth'
 
 
 function App() {
@@ -15,6 +15,7 @@ function App() {
         <Routes>
           <Route path='/' element={<Home/>}/>
           <Route path='/channelpage' element={<ChannelPage/>}/>
+          <Route path="/login" element={<Auth />}/>
         </Routes>
       </BrowserRouter>
    </>

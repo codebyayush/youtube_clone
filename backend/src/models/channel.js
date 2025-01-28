@@ -1,38 +1,36 @@
 import mongoose from "mongoose";
 
 const channelSchema = new mongoose.Schema({
-  channelId: {
+  channelId: {  
     type: String,
     required: true,
-    unique: true,
+    unique: true,  
   },
   channelName: {
     type: String,
     required: true,
   },
-  owner: {
+  owner: {  
     type: String,
     required: true,
   },
-  description: {
+  description: {  
     type: String,
-    required: true,
   },
-  channelBanner: {
+  channelBanner: {  
     type: String,
-    required: true,
   },
-  subscribers: {
+  subscribers: {  
     type: Number,
-    required: true,
+    default: 0,
   },
-  videos: [
+  videos: [ 
     {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Video",
     },
   ],
 });
 
 const Channel = mongoose.model("Channel", channelSchema);
-
-module.exports = Channel;
+export default Channel;

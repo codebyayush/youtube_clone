@@ -1,5 +1,5 @@
 import React, { createContext } from "react";
-import { X, LogOut } from "lucide-react";
+import { X, LogOut, Menu } from "lucide-react";
 
 const SidebarContext = createContext();
 
@@ -10,25 +10,23 @@ const Sidebar = ({ children, ...props }) => {
     <>
     {/* conditionally rendering the sidebar if the screen is less than 700px it'll be hidden otherwise icons will be shown */}
       <aside
-        className={`h-screen screen-max-7:absolute overflow-hidden transition-all duration-300 ${
-          isVisible ? "w-64" : "w-20"
-        }  screen-max-7:${isVisible ? "w-64" : "w-0"} bg-white border-0`}
+        className={`h-screen fixed screen-max-7:fixed overflow-hidden transition-all duration-300 ${
+          isVisible ? "w-64" : "w-[78px]"
+        } screen-max-7:${isVisible ? "w-64" : "w-0"} bg-white `}
 
       >
-        <nav className="h-full flex flex-col border-r shadow-md">
-          <div className="w-full flex justify-end h-fit mt-2">
-            <X
-              size={40}
-              className="cursor-pointer mr-3"
-              onClick={() => {
-                isOpenHandler();
-              }}
-            />
-          </div>
+        <nav className="h-full flex flex-col ">
+            <div className="w-full flex justify-end h-fit mt-5">
+              <Menu
+                size={40}
+                className="cursor-pointer mr-3"
+                onClick={() => {
+                  isOpenHandler();
+                }}
+              />
+            </div>
           <ul className={`flex-1 p-3 mt-5`}>{children}</ul>
-
           <hr className="mx-3 my-3 " />
-
           <button
             className="flex gap-3 px-3 pb-3 hover:bg-gray-200 mb-3 items-center py-2 font-medium rounded-md cursor-pointer bg-white mx-2"
           >
