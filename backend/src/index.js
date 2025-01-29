@@ -3,6 +3,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import router from "./routes/user.js";
+import cookieParser from "cookie-parser";
 
 
 const app = express();
@@ -20,11 +21,14 @@ const corsOptions = {
     credentials: true
 };
 
+//all global middlewares
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
+// all routes
 app.use(router);
 
 app.listen(port, () => {

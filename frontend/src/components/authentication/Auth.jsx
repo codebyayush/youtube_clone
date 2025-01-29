@@ -1,9 +1,11 @@
 import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginSignupSwitchHandler } from "../../store/slices/authSlice";
+import axios from "axios";
 
 const Auth = () => {
   const isLogin = useSelector((state) => state.auth.loginSignupSwitch);
+
   const dispatch = useDispatch();
 
   const usernameRef = useRef();
@@ -15,10 +17,9 @@ const Auth = () => {
     event.preventDefault();
 
     const email = emailRef.current.value;
-    const loginMode = useSelector((state) => state.auth.loginSignupSwitch);
 
     // if login mode is true then we'll login the user
-    if (loginMode) {
+    if (isLogin) {
       const password = passRef.current.value;
 
       try {
@@ -33,17 +34,6 @@ const Auth = () => {
         if (response.status === 200 || response.status === 201) {
           dispatch(handleLogin());
 
-          // const result = await fetchCart();
-          // console.log("result from auth.jsx--", result);
-
-          // try {
-          //   if (result.status === 200 || result.status === 201) {
-          //     dispatch(addAllItemsToCart(result.data));
-          //     dispatch(totalAmount());
-          //   }
-          // } catch (error) {
-          //   console.error("Error fetching cart items:", error.message);
-          // }
         }
         navigate("/productList");
       } catch (error) {
@@ -52,6 +42,7 @@ const Auth = () => {
 
       emailRef.current.value = "";
       passRef.current.value = "";
+
     } else {
       // if login mode is false then we'll create a new user
       const username = usernameRef.current.value.trim();

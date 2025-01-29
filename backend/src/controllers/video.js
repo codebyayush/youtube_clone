@@ -8,94 +8,125 @@ const youtube = google.youtube({
   auth: "AIzaSyD4lANTCWo9wpZMFs-ZjVE--8Yxwtme0P4",
 });
 
+
+// Helper function to add delays
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+
 export const fetchDataFromYoutubeAndPushToDb = async (req, res) => {
   try {
-    // Fetch video data using search API
-    const response = await youtube.search.list({
-      part: "snippet", 
+    // initial search for videos
+    const searchResponse = await youtube.search.list({
+      part: "snippet",
       type: "video",
       maxResults: 100,
     });
 
-    // looping through all the videos, then saving them to db with comments & channel
-    const videos = response.data.items.map(async (item) => {
-      // fetching video info
-      const videoData = await youtube.videos.list({
-        part: "statistics",
-        id: item.id.videoId,
-      });
+    // fetch video categories
+    const categoriesResponse = await youtube.videoCategories.list({
+      part: "snippet",
+      regionCode: "US",
+    });
+    const categories = categoriesResponse.data.items;
 
-      const videoInfo = videoData.data.items[0];
+    // process videos sequentially with rate limiting
+    for (const item of searchResponse.data.items) {
+      try {
+        // add delay between API calls
+        await sleep(1000); // 1 second delay between videos
 
-      // fetching channel details and saving
-      const channelId = await fetchChannelDetailsAndSave(item.snippet.channelId);
+        // fetch video details
+        const videoResponse = await youtube.videos.list({
+          part: "snippet,statistics",
+          id: item.id.videoId,
+        });
+        const videoInfo = videoResponse.data.items[0];
 
-      //creating and saving the video
-      const video = new Video({
-        videoId: item.id.videoId,
-        title: item.snippet.title,
-        thumbnailUrl: item.snippet.thumbnails.medium.url,
-        description: item.snippet.description,
-        channelId: channelId,
-        uploader: item.snippet.channelTitle,
-        uploadDate: new Date(item.snippet.publishedAt),
-        views: videoInfo.statistics.viewCount || 0,
-        likes: videoInfo.statistics.likeCount || 0,
-        dislikes: videoInfo.statistics.dislikeCount || 0,
-      });
+        // handle missing video info
+        if (!videoInfo) {
+          console.log(`Skipping deleted/unavailable video: ${item.id.videoId}`);
+          continue;
+        }
 
-      await video.save();
+        // get category name
+        const category = categories.find(cat => cat.id === videoInfo.snippet.categoryId);
+        const categoryName = category?.snippet?.title || "Unknown";
 
-      // fetching comments for current video
-      const commentsResponse = await youtube.commentThreads.list({
-        part: "snippet",
-        videoId: item.id.videoId,
-        maxResults: 10, //fetching 10 comments for each video
-      });
+        // save channel
+        const channelId = await fetchChannelDetailsAndSave(item.snippet.channelId);
 
-      // looping and saving the comments
-      const comments = commentsResponse.data.items.map(async (commentItem) => {
-        
-        const commentSnippet = commentItem.snippet.topLevelComment.snippet;
-
-        const comment = new Comment({
-          user: null,
-          video: video._id,
-          text: commentSnippet.textDisplay,
-          timestamp: new Date(commentSnippet.publishedAt),
+        // create video document
+        const video = new Video({
+          videoId: item.id.videoId,
+          title: item.snippet.title,
+          thumbnailUrl: item.snippet.thumbnails.medium.url,
+          description: item.snippet.description,
+          channelId: channelId,
+          uploader: item.snippet.channelTitle,
+          uploadDate: new Date(item.snippet.publishedAt),
+          views: videoInfo.statistics.viewCount || 0,
+          likes: videoInfo.statistics.likeCount || 0,
+          dislikes: videoInfo.statistics.dislikeCount || 0,
+          category: categoryName,
         });
 
-        await comment.save();
+        await video.save();
 
-        //adding the comment to the video
-        video.comments.push(comment._id);
-      });
+        // attempt to fetch comments with error handling
+        let commentsResponse;
+        try {
+          commentsResponse = await youtube.commentThreads.list({
+            part: "snippet",
+            videoId: item.id.videoId,
+            maxResults: 10,
+          });
+        } catch (commentError) {
+          if (commentError.code === 403) {
+            console.log(`Comments disabled for video: ${item.id.videoId}`);
+            commentsResponse = { data: { items: [] } };
+          } else {
+            throw commentError;
+          }
+        }
 
-      //waiting for all comments to be saved
-      await Promise.all(comments);
+        // process comments if available
+        const commentPromises = commentsResponse.data.items.map(async (commentItem) => {
+          const commentSnippet = commentItem.snippet.topLevelComment.snippet;
+          
+          const comment = new Comment({
+            user: null,
+            video: video._id,
+            text: commentSnippet.textDisplay,
+            timestamp: new Date(commentSnippet.publishedAt),
+          });
 
-      //again saving the video
-      await video.save();
+          await comment.save();
+          return comment._id;
+        });
 
-      console.log(
-        `Video "${item.snippet.title}" and its comments saved to MongoDB`
-      );
+        const commentIds = await Promise.all(commentPromises);
+        video.comments = commentIds;
+        await video.save();
 
-      //adding the video to the channel
-      const channel = await Channel.findById(channelId);
-      channel.videos.push(video._id);
-      await channel.save();
-    });
+        // update channel with video reference
+        await Channel.findByIdAndUpdate(channelId, {
+          $push: { videos: video._id }
+        });
 
-    // waiting for all user data to be saved
-    await Promise.all(videos);
+        console.log(`Processed video: ${item.snippet.title}`);
+      } catch (videoError) {
+        console.error(`Error processing video ${item.id.videoId}:`, videoError.message);
+        // continue processing other videos even if one fails
+      }
+    }
 
-    res.status(200).send("Videos and comments saved successfully");
+    res.status(200).send("Video processing completed");
   } catch (error) {
-    console.error("Error fetching YouTube video data: ", error);
-    res.status(500).send("Error fetching YouTube video data");
+    console.error("Critical error in video processing:", error);
+    res.status(500).send("Video processing failed");
   }
 };
+
 
 export const deleteAllVideosAndComments = async (req, res) => {
   try {
@@ -153,3 +184,14 @@ const fetchChannelDetailsAndSave = async (channelId) => {
       throw error;
     }
   };
+
+//fetching all videos from database
+export const fetchVideos = async(req, res) => {
+      try {
+          const result = await Video.find({});
+          res.status(200).json({result: result});
+          return;
+      } catch (error) {
+          res.status(500).json({msg: "Failed to fetch videos from database"})
+      }
+};
