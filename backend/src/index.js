@@ -5,7 +5,6 @@ import bodyParser from "body-parser";
 import router from "./routes/user.js";
 import cookieParser from "cookie-parser";
 
-
 const app = express();
 const port = 4000;
 

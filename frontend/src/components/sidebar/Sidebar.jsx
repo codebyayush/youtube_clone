@@ -3,12 +3,31 @@ import { LogOut, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { isVisibleHandler } from "../../store/slices/headerSlice";
-
+import { handleLogout } from "../../store/slices/authSlice";
+import axios from "axios";
 
 const Sidebar = ({ children }) => {
 
   const isVisible = useSelector(state => state.header.isVisible);
+  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
   const dispatch = useDispatch();
+
+  const onLogout = async () => {
+
+    try {
+      const result = await axios.get("http://localhost:4000/logout", {
+        withCredentials: true
+      });
+
+      if(result.status === 200){
+        dispatch(handleLogout());
+      }
+      console.log("successfully logged out");
+      
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  }
 
   return (
     <>
@@ -29,11 +48,15 @@ const Sidebar = ({ children }) => {
             />
           </div>
           <ul className={`flex-1 p-3 mt-5`}>{children}</ul>
-          <hr className="mx-3 my-3 " />
-          <button className="flex gap-3 px-3 pb-3 hover:bg-gray-200 mb-3 items-center py-2 font-medium rounded-md cursor-pointer bg-white mx-2">
-            <LogOut className="mt-1" />
-            {isVisible && <p className="text-xl">Logout</p>}
-          </button>
+          {isLoggedIn && (
+            <>
+              <hr className="mx-3 my-3 " />
+              <button onClick={onLogout} className="flex gap-3 px-3 pb-3 hover:bg-gray-200 mb-3 items-center py-2 font-medium rounded-md cursor-pointer bg-white mx-2">
+                <LogOut className="mt-1" />
+                {isVisible && <p className="text-xl">Logout</p>}
+              </button>
+            </>
+          )}
         </nav>
       </aside>
     </>

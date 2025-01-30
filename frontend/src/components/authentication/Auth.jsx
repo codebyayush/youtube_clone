@@ -1,12 +1,15 @@
 import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loginSignupSwitchHandler } from "../../store/slices/authSlice";
+import { handleLogin, loginSignupSwitchHandler } from "../../store/slices/authSlice";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 
 const Auth = () => {
   const isLogin = useSelector((state) => state.auth.loginSignupSwitch);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const usernameRef = useRef();
   const emailRef = useRef();
@@ -35,9 +38,9 @@ const Auth = () => {
           dispatch(handleLogin());
 
         }
-        navigate("/productList");
+        navigate("/");
       } catch (error) {
-        console.error("Login failed:", error.message);
+        console.error("Login failed:", error);
       }
 
       emailRef.current.value = "";

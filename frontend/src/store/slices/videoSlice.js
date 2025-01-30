@@ -6,12 +6,26 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
     videos: [],
     filteredVideos: [],
+    selectedVideo: null,
+    comments: [],
+    suggestedVideos: [],
 };
 
 const videoSlice = createSlice({
     name: 'video',
     initialState,
     reducers: {
+
+        setSuggestedVideos: (state, action) => {
+            const videoId = action.payload;
+
+            state.suggestedVideos = state.videos.filter(video => video.videoId !== videoId);
+        },
+
+        setSelectedVideo: (state, action) => {
+            state.selectedVideo = action.payload;
+        },
+
         filterByTag: (state, action) => {
             const tag = action.payload;
 
@@ -45,10 +59,17 @@ const videoSlice = createSlice({
                 state.videos = allVideos;
                 state.filteredVideos = allVideos;
             };
-        }
+        },
+
+
+        setComments: (state, action) => {
+            state.comments = action.payload;
+        },
+
+
     }
 })
 
-export const { filterByTag, addAllVideos } = videoSlice.actions;
+export const { filterByTag, addAllVideos, setComments, setSelectedVideo, setSuggestedVideos } = videoSlice.actions;
 
 export default videoSlice.reducer;

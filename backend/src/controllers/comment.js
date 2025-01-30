@@ -1,4 +1,4 @@
-import Comment from "../models/comment";
+import Comment from "../models/comment.js";
 
 
 export const createComment = async (req, res) => {
@@ -26,15 +26,41 @@ export const createComment = async (req, res) => {
 
 export const fetchComments = async (req, res) => {
     try {
-        const videoId = req.params.videoId;
-        const comments = await Comment.find({ videoId: videoId });
+        const {videoId} = req.params;
+
+        console.log("--------------------vid",videoId);
+
+        const comments = await Comment.find({ video: videoId });
+        console.log("comments--------",comments)
         res.status(200).json({ comments: comments });
         return;
+
     } catch (error) {
         res.status(500).json({ msg: error.message });
         return;
     }
 };
+
+export const getCommentById = async (req, res) => {
+
+    console.log("req.params.commentId--", req.params.commentId);
+    
+    try {
+        const {commentId} = req.params;
+        const comment = await Comment.findOne({commentId: commentId});
+
+        if (!comment) {
+            throw new Error("Comment not found");
+        }
+        res.status(200).json({ comment: comment });
+        return;
+    } catch (error) {
+        console.log("--------------------------",error)
+        res.status(500).json({ msg: error.message });
+        return;
+    }
+};
+
 
 //deleting comment by commentId
 export const deleteComment = async (req, res) => {

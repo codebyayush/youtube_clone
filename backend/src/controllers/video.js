@@ -186,7 +186,7 @@ const fetchChannelDetailsAndSave = async (channelId) => {
   };
 
 //fetching all videos from database
-export const fetchVideos = async(req, res) => {
+export const fetchVideos = async (req, res) => {
       try {
           const result = await Video.find({});
           res.status(200).json({result: result});
@@ -194,4 +194,18 @@ export const fetchVideos = async(req, res) => {
       } catch (error) {
           res.status(500).json({msg: "Failed to fetch videos from database"})
       }
+};
+
+//get video by id
+export const getVideoById = async (req, res) => {
+    try{
+        const {videoId} = req.params;
+        // console.log("---------------------", videoId);
+        const video = await Video.findOne({videoId: videoId});
+        res.status(200).json({result: video});
+        return; 
+    }
+    catch(error){
+        res.status(500).json({msg: "Failed to fetch video from database"})
+    }
 };

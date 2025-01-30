@@ -5,12 +5,17 @@ import ChannelPage from './components/channel-page/ChannelPage'
 import Home from './components/home/Home'
 import Auth from './components/authentication/Auth'
 import { addAllVideos } from './store/slices/videoSlice'
-import { useDispatch } from 'react-redux'
+import VideoPage from "./components/video-page/VideoPage";
+import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
+import { setIsLoginUsingToken } from './store/slices/authSlice'
+
+
 
 function App() {
   
   const dispatch = useDispatch();
+  const isLogin = useSelector(state => state.auth.isLogin);
 
   //this will fetch all the videos from db and push it to the redux videos array
   useEffect(() => {
@@ -33,14 +38,34 @@ function App() {
   }, []);
 
 
+useEffect(() => {
+    const isLoginCheck = async () => {
+      const waitForMe = await axios.get("http://localhost:4000/islogin", {
+        withCredentials: true,
+      });
+
+      if (waitForMe.status === 200) {
+        console.log("user is logged in--", waitForMe);
+        dispatch(setIsLoginUsingToken(waitForMe.data));
+      }
+
+      console.log("current login status-- ", waitForMe);
+      return;
+    };
+
+    isLoginCheck();
+  }, []);
+
+
   return (
    <>
       <BrowserRouter>
         <Header/>
         <Routes>
           <Route path='/' element={<Home/>}/>
+          <Route path='/videopage/:videoId' element={<VideoPage />}/>
           <Route path='/channelpage' element={<ChannelPage/>}/>
-          <Route path="/login" element={<Auth />}/>
+          {!isLogin &&  <Route path="/login" element={<Auth />}/>}
         </Routes>
       </BrowserRouter>
    </>

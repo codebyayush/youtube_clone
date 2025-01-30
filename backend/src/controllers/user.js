@@ -47,16 +47,16 @@ export const handleCreateNewUser = async (req, res) => {
 //logging in to existing user account and creating a token
 //on successful login
 export const handleLogin = async (req, res) => {
-    
+
     try {
 
         const { email, password } = req.body;
-        console.log(typeof email, typeof password);
-        const cleanedEmail = email.trim().toLowerCase();
 
-        const user = await User.findOne({email});
+        // console.log(email, password);
 
-        console.log("user--", user);
+        const user = await User.findOne({ email });
+
+        console.log("user--", user);        
 
         if(!user){
             throw new Error("User does not exist");
@@ -68,7 +68,7 @@ export const handleLogin = async (req, res) => {
             throw new Error("Invalid Password");
         }
 
-        const token = createToken(user._id);
+        const token = createToken({id: user._id});
 
         res.cookie("jwt", token, {
             httpOnly: true,
