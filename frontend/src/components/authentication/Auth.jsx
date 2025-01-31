@@ -4,7 +4,6 @@ import { handleLogin, loginSignupSwitchHandler } from "../../store/slices/authSl
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-
 const Auth = () => {
   const isLogin = useSelector((state) => state.auth.loginSignupSwitch);
 
@@ -32,11 +31,10 @@ const Auth = () => {
           { withCredentials: true }
         );
 
-        // console.log("response from authentication.jsx--", response);
+        console.log("response from authentication.jsx--", response);
 
         if (response.status === 200 || response.status === 201) {
           dispatch(handleLogin());
-
         }
         navigate("/");
       } catch (error) {

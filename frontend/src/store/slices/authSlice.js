@@ -4,6 +4,7 @@ const initialState = {
   loginSignupSwitch: true,
   isLoggedIn: false,
   isUserToken: false,
+  userName: "",
 };
 
 const authSlice = createSlice({
@@ -25,12 +26,16 @@ const authSlice = createSlice({
       state.isLoggedIn = isLogIn;
     },
 
+    setUserName: (state, action) => {
+        state.userName = action.payload;
+    },
+
     loginSignupSwitchHandler: (state) => {
         state.loginSignupSwitch = !state.loginSignupSwitch;
     }
   },
 });
 
-export const { handleLogout, handleLogin, loginSignupSwitchHandler, setIsLoginUsingToken } = authSlice.actions;
+export const { handleLogout, handleLogin, loginSignupSwitchHandler, setIsLoginUsingToken, setUserName } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -3,6 +3,7 @@ import Video from "../models/video.js";
 import Comment from "../models/comment.js";
 import Channel from "../models/channel.js";
 
+//getting youtube data from youtube api
 const youtube = google.youtube({
   version: "v3",
   auth: "AIzaSyD4lANTCWo9wpZMFs-ZjVE--8Yxwtme0P4",
@@ -127,6 +128,41 @@ export const fetchDataFromYoutubeAndPushToDb = async (req, res) => {
   }
 };
 
+//disliking a video
+export const dislikeVideo = async (req, res) => {
+  try {
+    const videoId = req.params.videoId;
+    const video = await Video.findById(videoId);
+    if (!video) {
+      return res.status(404).json({ error: "Video not found" });
+    }
+    video.dislikes += 1;
+    await video.save();
+    res.status(200).json(video);
+  } catch (error) {
+    console.error("Error disliking video:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+}
+
+//liking a video
+export const likeVideo = async (req, res) => {
+  try {
+    const videoId = req.params.videoId;
+    const video = await Video.findById(videoId);
+    if (!video) {
+      return res.status(404).json({ error: "Video not found" });
+    }
+    video.likes += 1;
+    await video.save();
+    res.status(200).json(video);
+  } catch (error) {
+    console.error("Error liking video:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+}
+
+
 
 export const deleteAllVideosAndComments = async (req, res) => {
   try {
@@ -139,6 +175,7 @@ export const deleteAllVideosAndComments = async (req, res) => {
     console.error("Failed to delete all videos", error);
   }
 };
+
 
 const fetchChannelDetailsAndSave = async (channelId) => {
     try {

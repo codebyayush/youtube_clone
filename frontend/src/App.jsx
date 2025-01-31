@@ -8,7 +8,7 @@ import { addAllVideos } from './store/slices/videoSlice'
 import VideoPage from "./components/video-page/VideoPage";
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
-import { setIsLoginUsingToken } from './store/slices/authSlice'
+import { setIsLoginUsingToken, setUserName } from './store/slices/authSlice'
 
 
 
@@ -37,24 +37,35 @@ function App() {
     fetchAll();
   }, []);
 
+//to check login status
+  useEffect(() => {
+      const isLoginCheck = async () => {
+        const waitForMe = await axios.get("http://localhost:4000/islogin", {
+          withCredentials: true,
+        });
 
-useEffect(() => {
-    const isLoginCheck = async () => {
-      const waitForMe = await axios.get("http://localhost:4000/islogin", {
-        withCredentials: true,
-      });
+        console.log("waitForMe--", waitForMe);
 
-      if (waitForMe.status === 200) {
-        console.log("user is logged in--", waitForMe);
-        dispatch(setIsLoginUsingToken(waitForMe.data));
-      }
+        if (waitForMe.status === 200) {
+          console.log("user is logged in--", waitForMe);
+          dispatch(setIsLoginUsingToken(waitForMe.data));
 
-      console.log("current login status-- ", waitForMe);
-      return;
-    };
+          //setting the username to the top using api & redux
+          const user = await axios.get("http://localhost:4000/getUser", {
+            withCredentials: true,
+          })
 
-    isLoginCheck();
-  }, []);
+          if(user.status === 200){
+            dispatch(setUserName(user.data.result.username));
+        }
+
+        console.log("current login status-- ", waitForMe);
+        return;
+      };
+    }
+
+      isLoginCheck();
+    }, []);
 
 
   return (

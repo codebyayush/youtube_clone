@@ -119,3 +119,16 @@ export const isLoginCheck = (req, res) => {
       }
 };
 
+
+export const getUserByUserId = async(req, res) => {
+    try {
+        const userId = req.userId;
+        
+        const user = await User.findById(userId);
+        res.status(200).json({result: user});
+        return;
+    } catch (error) {
+        res.status(500).json({msg: "Failed to fetch user from database"})
+    }
+};
+
