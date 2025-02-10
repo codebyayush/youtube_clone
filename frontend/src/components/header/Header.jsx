@@ -19,7 +19,7 @@ const Header = () => {
   const isVisible = useSelector((state) => state.header.isVisible);
   const userName = useSelector((state) => state.auth.userName);
 
-  console.log("user--", userName);
+  console.log("userName--", userName);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -72,7 +72,7 @@ const Header = () => {
             <>
               <FaVideo className="w-5 h-5 transition-transform duration-300 hover:scale-125" />
               <FaRegBell className="w-5 h-5 transition-transform duration-300 hover:scale-125" />
-              <div className="flex items-center gap-2 rounded-full cursor-pointer border px-3  transition-transform duration-300 hover:scale-105">
+              <div onClick={() => navigate("/profile")} className="flex items-center gap-2 rounded-full cursor-pointer border px-3  transition-transform duration-300 hover:scale-105">
                 <User className="w-5 h-5 transition-transform duration-300 hover:scale-125" />
                 <p className="text-black text-xs font-semibold">{userName}</p>
               </div>

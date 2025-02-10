@@ -1,8 +1,9 @@
 import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { handleLogin, loginSignupSwitchHandler } from "../../store/slices/authSlice";
+import { handleLogin, loginSignupSwitchHandler, setUserName } from "../../store/slices/authSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+
 
 const Auth = () => {
   const isLogin = useSelector((state) => state.auth.loginSignupSwitch);
@@ -35,6 +36,17 @@ const Auth = () => {
 
         if (response.status === 200 || response.status === 201) {
           dispatch(handleLogin());
+
+          const fetchUser = await axios.get("http://localhost:4000/getUser", {
+            withCredentials: true,
+          })
+
+          if(fetchUser.status === 200){
+            console.log("getting user after authentication---",fetchUser);
+            
+            dispatch(setUserName(fetchUser.data.result.username));
+          };
+          
         }
         navigate("/");
       } catch (error) {

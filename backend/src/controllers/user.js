@@ -131,4 +131,3 @@ export const getUserByUserId = async(req, res) => {
         res.status(500).json({msg: "Failed to fetch user from database"})
     }
 };
-

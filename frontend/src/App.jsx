@@ -9,6 +9,7 @@ import VideoPage from "./components/video-page/VideoPage";
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import { setIsLoginUsingToken, setUserName } from './store/slices/authSlice'
+import Profile from './components/header/Profile'
 
 
 
@@ -75,8 +76,9 @@ function App() {
         <Routes>
           <Route path='/' element={<Home/>}/>
           <Route path='/videopage/:videoId' element={<VideoPage />}/>
-          <Route path='/channelpage' element={<ChannelPage/>}/>
+          <Route path='/channelpage/:channelId' element={<ChannelPage/>}/>
           {!isLogin &&  <Route path="/login" element={<Auth />}/>}
+          <Route path="/profile" element={<Profile/>}/>
         </Routes>
       </BrowserRouter>
    </>

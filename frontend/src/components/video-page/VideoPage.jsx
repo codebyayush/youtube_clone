@@ -33,6 +33,7 @@ const VideoPage = () => {
   const { videoId } = useParams();
   const [newComment, setNewComment] = useState("");
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [channelBanner, setChannelBanner] = useState("");
 
   //toggling full description
   const toggleDescription = () => setShowFullDescription(!showFullDescription);
@@ -158,6 +159,17 @@ const VideoPage = () => {
           dispatch(setSuggestedVideos(videoId));
           dispatch(setSelectedVideo(result.data.result));
 
+
+          //fetching the channel banner from channel route
+          const fetchChannel = await axios.get(
+            `http://localhost:4000/fetchChannel/${result.data.result.channelId}`);
+
+          if (fetchChannel.status === 200) {
+            // dispatch(setSelectedVideo(fetchChannel.data.result));
+            console.log("channel result---",fetchChannel.data.result);
+            setChannelBanner(fetchChannel.data.result.channelBanner);
+          };
+
           //fetching comments using ObjectId of the fetched video
           const commentResults = await axios.get(
             `http://localhost:4000/getComments/${result.data.result._id}`
@@ -166,7 +178,7 @@ const VideoPage = () => {
           if (commentResults.status === 200) {
             const allComments = commentResults.data.comments;
             dispatch(setComments(allComments));
-          }
+          };
         }
       } catch (error) {
         console.log("Error fetching data--", error);
@@ -179,7 +191,7 @@ const VideoPage = () => {
   return (
     <>
       <div
-        className={`p-20 screen-max-7:pt-10 screen-max-7:p-3 ${
+        className={`p-20 screen-max-7:pt-48 screen-max-7:p-3 ${
           isVisible ? "pl-64" : "pl-24"
         } transition-all duration-300`}
       >
@@ -215,11 +227,15 @@ const VideoPage = () => {
               {/* video Stats and Uploader Info */}
               <div className="mt-4 flex items-center justify-between ">
                 <div className="flex items-center gap-4">
-                  <CircleUser className="w-10 h-10" />
+
+                  <img alt="profile" src={channelBanner}  className="w-10 shadow-lg border border-gray-300 h-10 rounded-full" />
                   <div className="flex flex-col">
+                    <div className="flex gap-5">
+                    <h4 className="text-base font-medium mt-2">{video.uploader}</h4>
                     <button className="bg-black text-white px-4 py-2 rounded-full">
                       Subscribe
                     </button>
+                    </div>
                     <p className="text-xs text-gray-500 mt-3">
                       Published on{" "}
                       {new Date(video.uploadDate).toLocaleDateString()}

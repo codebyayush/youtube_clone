@@ -4,7 +4,7 @@ import { handleLogin, handleLogout, handleCreateNewUser, isLoginCheck, getUserBy
 import requireAuth from "../middlewares/requireAuth.js";
 import { getVideoById } from "../controllers/video.js";
 import { fetchComments, addComment, deleteComment, editComment } from "../controllers/comment.js";
-
+import { fetchChannel } from "../controllers/channel.js";
 
 const router = Router();
 
@@ -46,5 +46,9 @@ router.route("/deleteComment/:commentId").delete(requireAuth, deleteComment);
 router.route("/likeVideo/:videoId").put(requireAuth, likeVideo);
 //dislike route
 router.route("/dislikeVideo/:videoId").put(requireAuth, dislikeVideo);
+
+
+//Channel ROUTES
+router.route("/fetchChannel/:channelId").get(fetchChannel);
 
 export default router;

@@ -163,7 +163,6 @@ export const likeVideo = async (req, res) => {
 }
 
 
-
 export const deleteAllVideosAndComments = async (req, res) => {
   try {
     await Video.deleteMany();

@@ -8,6 +8,8 @@ const initialState = {
   filteredVideos: [],
   selectedVideo: null,
   comments: [],
+  liked: false,
+  disliked: false,
   suggestedVideos: [],
 };
 
