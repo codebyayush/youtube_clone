@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Header from './components/header/Header'
-import ChannelPage from './components/channel-page/ChannelPage'
+import ChannelPage from './components/channel/ChannelPage'
 import Home from './components/home/Home'
 import Auth from './components/authentication/Auth'
 import { addAllVideos } from './store/slices/videoSlice'
@@ -9,8 +9,7 @@ import VideoPage from "./components/video-page/VideoPage";
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import { setIsLoginUsingToken, setUserName } from './store/slices/authSlice'
-import Profile from './components/header/Profile'
-
+import CreateChannel from './components/channel/CreateChannel'
 
 
 function App() {
@@ -78,7 +77,7 @@ function App() {
           <Route path='/videopage/:videoId' element={<VideoPage />}/>
           <Route path='/channelpage/:channelId' element={<ChannelPage/>}/>
           {!isLogin &&  <Route path="/login" element={<Auth />}/>}
-          <Route path="/profile" element={<Profile/>}/>
+          <Route path="/createChannel" element={<CreateChannel />}/>
         </Routes>
       </BrowserRouter>
    </>

@@ -10,14 +10,14 @@ const channelSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  owner: {  
+  owner: {
     type: String,
     required: true,
   },
   description: {  
     type: String,
   },
-  channelBanner: {  
+  channelBanner: {
     type: String,
   },
   subscribers: {  

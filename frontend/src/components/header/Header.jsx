@@ -13,11 +13,16 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { isVisibleHandler } from "../../store/slices/headerSlice";
+import ProfileSidebar from "./ProfileSidebar";
+
 
 const Header = () => {
   const isLogin = useSelector((state) => state.auth.isLoggedIn);
   const isVisible = useSelector((state) => state.header.isVisible);
   const userName = useSelector((state) => state.auth.userName);
+
+  //for profile click sidebar
+  const [enabled, setEnabled] = useState(false);
 
   console.log("userName--", userName);
 
@@ -72,7 +77,7 @@ const Header = () => {
             <>
               <FaVideo className="w-5 h-5 transition-transform duration-300 hover:scale-125" />
               <FaRegBell className="w-5 h-5 transition-transform duration-300 hover:scale-125" />
-              <div onClick={() => navigate("/profile")} className="flex items-center gap-2 rounded-full cursor-pointer border px-3  transition-transform duration-300 hover:scale-105">
+              <div onClick={() => setEnabled(!enabled)} className="flex items-center gap-2 rounded-full cursor-pointer border px-3  transition-transform duration-300 hover:scale-105">
                 <User className="w-5 h-5 transition-transform duration-300 hover:scale-125" />
                 <p className="text-black text-xs font-semibold">{userName}</p>
               </div>
@@ -83,10 +88,11 @@ const Header = () => {
               className="flex gap-2 rounded-full cursor-pointer hover:bg-gray-200 px-3 -mt-2"
             >
               <h1 className="text-lg mt-[4px] cursor-pointer">Sign In</h1>
-              <LogIn className="mt-2 screen-max-7:mt-0" />
+              <LogIn className="mt-2 screen-max-7:mt-0"/>
             </div>
           )}
         </div>
+        {enabled && <ProfileSidebar setEnabled={() => setEnabled(false)}/>}
       </div>
 
       {/* sidebar component */}

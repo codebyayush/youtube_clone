@@ -1,9 +1,10 @@
-
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     videos: [],
     isChannel: false,
     channelName: "",
+    channel: null,
 }
 
 
@@ -12,11 +13,11 @@ const channelSlice = createSlice({
     initialState,
     reducers: {
         setChannel: (state, action) => {
-            state.isChannel = action.payload
+            state.channel = action.payload;
         },
         setChannelName: (state, action) => {
             state.channelName = action.payload
-        }
+        },
     }
 });
 
