@@ -1,8 +1,6 @@
 import mongoose from "mongoose";
 
-
 const userSchema = new mongoose.Schema({
-  
   username: {
     type: String,
     required: true,
@@ -16,12 +14,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  channels: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Channel",
-    },
-  ],
+  channel: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Channel",
+  },
   comments: [
     {
       type: mongoose.Schema.Types.ObjectId,

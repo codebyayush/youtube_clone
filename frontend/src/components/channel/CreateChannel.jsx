@@ -1,9 +1,12 @@
 import React, { useRef } from "react";
 import { CircleUserRound } from "lucide-react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const CreateChannel = () => {
   const channelNameRef = useRef();
   const descRef = useRef();
+  const navigate = useNavigate();
 
   //creating a new channel
   const handleSubmit = async (e) => {
@@ -11,27 +14,28 @@ const CreateChannel = () => {
 
     console.log("files value---", e.target[0].files);
 
-    let baseUrl = null;
-    await convertToBase64(e.target[0].files[0]).then((result) => {
-      console.log("base64 result---", result);
+    const base64 = await convertToBase64(e.target[0].files[0]);
 
-      baseUrl = result;
+    console.log("base64---",base64);
+
+    const addChannel = await axios.post("http://localhost:4000/createChannel", {
+      channelId: Math.floor(Math.random() * 1000000000),
+      channelName: channelNameRef.current.value,
+      channelBanner: base64,
+      description: descRef.current.value,
+      subscribers: 0,
+    }, {
+      withCredentials: true
     });
 
-    // const addChannel = await axios.post("http://localhost:4000/createChannel", {
-    //   channelName: channelNameRef.current.value,
-    //   channelBanner: e.target[1].files[0],
-    //   description: e.target[2].value,
-    //   subscribers: 0,
-    // }, {
-    //   withCredentials: true
-    // });
+    console.log("addChannel result--", addChannel);
 
-    // console.log("addChannel result--", addChannel);
-
-    // if(addChannel.status === 200){
-    //   console.log("channel created successfully");
-    // }
+    if(addChannel.status === 200){
+      console.log("channel created successfully");
+      navigate("/");
+      channelNameRef.current.value = "";
+      descRef.current.value = "";
+    }
   };
 
   return (

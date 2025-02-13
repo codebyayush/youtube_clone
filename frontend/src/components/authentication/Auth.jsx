@@ -196,19 +196,17 @@ const Auth = () => {
             {isLogin ? "Login" : "Sign In"}
           </button>
           {!isLogin ? (
-            <p
-              className="text-center mt-5 hover:text-blue-500 cursor-pointer hover:underline"
-              onClick={() => dispatch(loginSignupSwitchHandler())}
-            >
-              Already have an account? Login
-            </p>
+            <>
+               <p className="mt-5 text-center">
+                Already have an account? <span className="hover:text-blue-500 cursor-pointer hover:underline" onClick={() => dispatch(loginSignupSwitchHandler())}>Login</span>
+               </p>
+            </>
           ) : (
-            <p
-              className="text-center mt-5 hover:text-blue-500 cursor-pointer hover:underline"
-              onClick={() => dispatch(loginSignupSwitchHandler())}
-            >
-              Don't have an account? Sign Up
-            </p>
+            <>
+               <p className="mt-5 text-center">
+                Don't have an account? <span className="hover:text-blue-500 cursor-pointer hover:underline" onClick={() => dispatch(loginSignupSwitchHandler())}>Sign in</span>
+               </p>
+            </>
           )}
         </form>
       </div>

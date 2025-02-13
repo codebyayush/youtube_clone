@@ -16,11 +16,13 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const fetchDataFromYoutubeAndPushToDb = async (req, res) => {
   try {
+
     // initial search for videos
     const searchResponse = await youtube.search.list({
       part: "snippet",
       type: "video",
       maxResults: 100,
+      // q: "",
     });
 
     // fetch video categories
@@ -219,7 +221,7 @@ const fetchChannelDetailsAndSave = async (channelId) => {
       console.error("Error fetching or saving channel details:", error);
       throw error;
     }
-  };
+};
 
 //fetching all videos from database
 export const fetchVideos = async (req, res) => {
@@ -231,7 +233,7 @@ export const fetchVideos = async (req, res) => {
           res.status(500).json({msg: "Failed to fetch videos from database"})
       }
 };
-
+ 
 //get video by id
 export const getVideoById = async (req, res) => {
     try{

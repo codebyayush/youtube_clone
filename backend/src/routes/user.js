@@ -1,18 +1,34 @@
 import { Router } from "express";
-import { fetchDataFromYoutubeAndPushToDb, deleteAllVideosAndComments, fetchVideos, likeVideo, dislikeVideo } from "../controllers/video.js";
-import { handleLogin, handleLogout, handleCreateNewUser, isLoginCheck, getUserByUserId } from "../controllers/user.js";
+import {
+  fetchDataFromYoutubeAndPushToDb,
+  deleteAllVideosAndComments,
+  fetchVideos,
+  likeVideo,
+  dislikeVideo,
+} from "../controllers/video.js";
+import {
+  handleLogin,
+  handleLogout,
+  handleCreateNewUser,
+  isLoginCheck,
+  getUserByUserId,
+} from "../controllers/user.js";
 import requireAuth from "../middlewares/requireAuth.js";
 import { getVideoById } from "../controllers/video.js";
-import { fetchComments, addComment, deleteComment, editComment } from "../controllers/comment.js";
+import {
+  fetchComments,
+  addComment,
+  deleteComment,
+  editComment,
+} from "../controllers/comment.js";
 import { createChannel, fetchChannel } from "../controllers/channel.js";
 import { getChannelByUserId } from "../controllers/channel.js";
 
 const router = Router();
 
-
-//ROUTES to add and remove all videos from youtube api in the channel, comment and video schemas 
-router.route("/fetchAndPushVideos").get(fetchDataFromYoutubeAndPushToDb)
-router.route("/fetchAndPushVideos").delete( deleteAllVideosAndComments );
+//ROUTES to add and remove all videos from youtube api in the channel, comment and video schemas
+router.route("/fetchAndPushVideos").get(fetchDataFromYoutubeAndPushToDb);
+router.route("/fetchAndPushVideos").delete(deleteAllVideosAndComments);
 
 //ROUTE to fetchVideos from the database
 router.route("/fetchAllVideos").get(fetchVideos);
@@ -31,6 +47,7 @@ router.route("/logout").get(handleLogout);
 router.route("/islogin").get(requireAuth, isLoginCheck);
 //get video by id
 router.route("/getVideo/:videoId").get(getVideoById);
+
 
 //Comments ROUTES
 //fetching all comments by videoId
