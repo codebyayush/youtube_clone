@@ -1,5 +1,119 @@
 import Channel from "../models/channel.js";
 import User from "../models/user.js";
+import Video from "../models/video.js";
+import mongoose from "mongoose";
+import { GridFSBucket } from "mongodb";
+import fs from "fs";
+
+let gfs;
+const conn = mongoose.connection;
+conn.once("open", () => {
+  gfs = new mongoose.mongo.GridFSBucket(conn.db, {
+    bucketName: "videos",
+  });
+  console.log("GridFS initialized");
+});
+
+//adding a new video to the channel
+export const addVideosToChannel = async (req, res) => {
+  const { channelId } = req.params; // extract channelId from the URL
+  const videoFile = req.file; // multer adds the file to req.file
+  const userId = req.userId;
+
+  // console.log("Uploaded file:", req.file);
+  // console.log("Temporary file path:", videoFile.path);
+
+  const user = await User.findById(userId);
+  const channel = await Channel.findById({_id: channelId});
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  if (!videoFile) {
+    return res.status(400).json({ message: "No video file provided" });
+  }
+
+  try {
+    // generate a unique videoId
+    const videoId = new mongoose.Types.ObjectId().toString();
+
+    console.log("videoId---",videoId);
+
+    //upload the video file to gridfs
+    const writeStream = gfs.openUploadStream(videoFile.originalname, {
+      metadata: {
+        videoId,
+        channelId,
+      },
+    });
+
+    console.log("writeStream---",writeStream);
+
+    fs.createReadStream(videoFile.path).pipe(writeStream);
+
+    writeStream.on("finish", async (file) => {
+      // delete the temporary file after upload
+      fs.unlinkSync(videoFile.path);
+
+      // create a new video document with required fields
+      const newVideo = new Video({
+        videoId,
+        title: videoFile.originalname, // use the file name as the title
+        thumbnailUrl: "https://example.com/default-thumbnail.jpg", // add a default thumbnail URL
+        description: "No description provided", // default description
+        channelId,
+        uploader: user.username, // default uploader name
+        views: 0,
+        likes: 0,
+        dislikes: 0 ,
+        uploadDate: new Date(),
+        comments: [],
+        category: "Uncategorized", // default category
+      });
+
+      // save the video document to the database
+      await newVideo.save();
+
+      // add the video to the channel's videos array
+      channel.videos.push(newVideo._id);
+      await channel.save();
+
+      res.status(200).json({ message: "Video uploaded successfully", videoId });
+    });
+
+    writeStream.on("error", (err) => {
+      console.error("Error uploading video to GridFS:", err);
+      res.status(500).json({ message: "Error uploading video" });
+    });
+  } catch (error) {
+    console.error("Error in addVideosToChannel:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+//get videos by channelID
+export const getVideosByChannelId = async (req, res) => {
+    const { channelId } = req.params;
+
+    try {
+        // accessing videos.files collection
+        const db = mongoose.connection.db;
+        const filesCollection = db.collection('videos.files');
+
+        // Find all videos with the specified channelId in metadata
+        const videos = await filesCollection.find({ 'metadata.channelId': channelId }).toArray();
+
+        if (videos.length === 0) {
+            return res.status(404).json({ message: "No videos found for this channel" });
+        }
+
+        res.status(200).json({ videos });
+    } catch (error) {
+        console.error("Error fetching videos:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
 
 
 //get the channel by channelId
@@ -90,25 +204,19 @@ export const createChannel = async (req, res) => {
   }
 };
 
-
-//adding a new video to the channel
-export const addVideosToChannel = async (req, res) => {
+//deleting a video from the channel
+export const deleteVideoFromChannel = async (req, res) => {
   try {
-    //get the channel and videoId from the body
-    const { channelId, videoId } = req.body;
+    const { videoId } = req.params;
 
-    //get the channel
-    const channel = await Channel.findOne({
-      _id: channelId,
-    });
+    const deleteVideo = await Video.deleteOne({ videoId: videoId });
 
-    if (!channel) {
-      throw new Error("Channel not found");
+    if (!deleteVideo) {
+      throw new Error("Video not found");
     }
 
-    //push videoId to the videos array in the channel
-    channel.videos.push(videoId);
-    //then save it
-    await channel.save();
-  } catch (error) {}
+    res.status(200).json({ msg: "Video deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ msg: "Failed to delete video" });
+  }
 };

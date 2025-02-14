@@ -234,7 +234,7 @@ export const fetchVideos = async (req, res) => {
       }
 };
  
-//get video by id
+//get video by videoid
 export const getVideoById = async (req, res) => {
     try{
         const {videoId} = req.params;
@@ -247,3 +247,17 @@ export const getVideoById = async (req, res) => {
         res.status(500).json({msg: "Failed to fetch video from database"})
     }
 };
+
+//get video by _id
+export const getVideoBy_id = async (req, res) => {
+  try{
+    const {videoId} = req.params;
+    // console.log("---------------------", videoId);
+    const video = await Video.findOne({_id: videoId});
+    res.status(200).json({result: video});
+    return; 
+}
+catch(error){
+    res.status(500).json({msg: "Failed to fetch video from database"})
+  }
+}

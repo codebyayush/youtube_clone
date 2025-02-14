@@ -4,10 +4,6 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import router from "./routes/user.js";
 import cookieParser from "cookie-parser";
-import multer from "multer";
-import { GridFSBucket } from 'mongodb';
-import fs from 'fs';
-import path from 'path';
 
 const app = express();
 const port = 4000;
@@ -40,16 +36,6 @@ app.use(express.urlencoded({ limit: '20mb', extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-// multer setup for file uploads
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // temporary storage for uploaded videos
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname); // use the original file name
-    }
-});
-const upload = multer({ storage });
 
 // all routes
 app.use(router);
