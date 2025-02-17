@@ -15,7 +15,7 @@ mongoose.connect("mongodb://localhost:27017/yoututor").then(() => {
     console.log("error connecting to db-",err);
 });
 
-// initializing GridFS
+// initializing GridFS to store videos
 let gfs;
 const conn = mongoose.connection;
 conn.once('open', () => {
@@ -31,8 +31,8 @@ const corsOptions = {
 
 //all global middlewares
 app.use(cors(corsOptions));
-app.use(express.json({ limit: '20mb' }));
-app.use(express.urlencoded({ limit: '20mb', extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 

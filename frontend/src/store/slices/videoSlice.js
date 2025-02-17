@@ -29,6 +29,26 @@ const videoSlice = createSlice({
       state.selectedVideo = action.payload;
     },
 
+    searchFilter: (state, action) => {
+      const searchQuery = action.payload.toLowerCase();
+      // console.log("videoSlice search query---", searchQuery);
+
+      const validVideos = state.videos.filter(video => video.title);
+
+      //filtering out the videos only if the search query matches the video title
+      const filtered = validVideos.filter((video) => {
+        // console.log("video title from slice---",video.title.toLowerCase());
+        // console.log("match---", video.title.toLowerCase().includes(searchQuery));
+
+        return (video.title.toLowerCase()).includes(searchQuery);
+      });
+
+      console.log('filtered videos---', filtered)
+
+      // if the filtered array is empty then we'll show all the videos
+      state.filteredVideos = filtered.length ? filtered : state.videos;
+    },
+
     filterByTag: (state, action) => {
       const tag = action.payload;
 
@@ -92,11 +112,17 @@ const videoSlice = createSlice({
     },
 
     likeVideo: (state, action) => {
-        state.selectedVideo = {...state.selectedVideo, likes: state.selectedVideo.likes + 1};
+      state.selectedVideo = {
+        ...state.selectedVideo,
+        likes: state.selectedVideo.likes + 1,
+      };
     },
 
     dislikeVideo: (state, action) => {
-        state.selectedVideo = {...state.selectedVideo, dislikes: state.selectedVideo.dislikes + 1};
+      state.selectedVideo = {
+        ...state.selectedVideo,
+        dislikes: state.selectedVideo.dislikes + 1,
+      };
     },
   },
 });
@@ -112,6 +138,7 @@ export const {
   deleteComment,
   likeVideo,
   dislikeVideo,
+  searchFilter,
 } = videoSlice.actions;
 
 export default videoSlice.reducer;

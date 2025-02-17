@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { isVisibleHandler } from "../../store/slices/headerSlice";
 import ProfileSidebar from "./ProfileSidebar";
+import { searchFilter } from "../../store/slices/videoSlice";
 
 
 const Header = () => {
@@ -24,10 +25,20 @@ const Header = () => {
   //for profile click sidebar
   const [enabled, setEnabled] = useState(false);
 
+  const [searchQuery, setSearchQuery] = useState("");
+
   console.log("userName--", userName);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  
+  const onChangeHandler = (e) => {
+    setSearchQuery(e.target.value);
+    console.log("target value--- ", e.target.value);
+    dispatch(searchFilter(e.target.value));
+  }
+
 
   return (
     <>
@@ -61,6 +72,8 @@ const Header = () => {
             type="text"
             placeholder="Search"
             className="bg-gray-200 py-2 px-4 border border-gray-400 w-full rounded-full"
+            onChange={onChangeHandler}
+            value={searchQuery}
           />
           <div className="h-10 w-10 -ml-12 border-l border-gray-400">
             <img
