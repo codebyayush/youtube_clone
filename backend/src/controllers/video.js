@@ -233,7 +233,7 @@ export const fetchVideos = async (req, res) => {
           res.status(500).json({msg: "Failed to fetch videos from database"})
       }
 };
- 
+
 //get video by videoid
 export const getVideoById = async (req, res) => {
     try{

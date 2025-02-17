@@ -17,7 +17,7 @@ const channelSlice = createSlice({
         },
         setChannelName: (state, action) => {
             state.channelName = action.payload
-        },
+        }, 
     }
 });
 

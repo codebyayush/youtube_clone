@@ -3,6 +3,8 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import Loader from "../loader/Loader";
 import "./addVideo.css";
+import AddFileButton from "./AddFileButton";
+
 
 const ChannelPage = () => {
   const [imageUrl, setImageUrl] = useState("");
@@ -12,49 +14,50 @@ const ChannelPage = () => {
 
   const { channelId } = useParams();
 
+  // fetching the channel and then the videos on component mount
   useEffect(() => {
     const fetchChannelAndVideos = async () => {
       try {
+        // fetching channel
         const result = await axios.get(
           `http://localhost:4000/fetchChannel/${channelId}`,
-          {
-            withCredentials: true,
-          }
+          { withCredentials: true }
         );
-
+  
         if (result.status === 200) {
-          console.log(
-            "channel banner result---",
-            result.data.result.channelBanner
-          );
           setChannel(result.data.result);
           setImageUrl(result.data.result.channelBanner);
-
+  
+          // fetching videos
+          const videos = [];
           for (let i = 0; i < result.data.result.videos.length; i++) {
             try {
               const video = await axios.get(
                 `http://localhost:4000/getVideoBy_id/${result.data.result.videos[i]}`,
-                {
-                  withCredentials: true,
-                }
+                { withCredentials: true }
               );
-              console.log("video---", video);
-
-              if (video.status === 200) {
-                setVideoArr((prev) => [...prev, video.data.result]);
+  
+              if (video.status === 200 && video.data.result) {
+                // checking for duplicates before adding video to the videos array
+                if (!videos.some((v) => v._id === video.data.result._id)) {
+                  videos.push(video.data.result);
+                }
               }
             } catch (error) {
               console.log("Error fetching video:", error);
             }
           }
+  
+          // updating the state once all videos are fetched
+          setVideoArr(videos);
         }
       } catch (err) {
-        return console.log("Error fetching channel:", err);
+        console.log("Error fetching channel:", err);
       }
     };
-
+  
     fetchChannelAndVideos();
-  }, []);
+  }, [channelId]);
 
   console.log("videoArr---", videoArr);
 
@@ -105,6 +108,25 @@ const ChannelPage = () => {
       }
     } catch (error) {
       console.log("Error uploading video:", error);
+    }
+  };
+
+  //delete handler 
+  const deleteVideo = async (videoId) => {
+
+    try {
+
+      const result = await axios.delete(`http://localhost:4000/deleteVideo/${videoId}`, {
+        withCredentials: true
+      });
+
+      if(result.status === 200){
+        console.log("video deleted successfully");
+        window.location.reload();
+      }
+      
+    } catch (error) {
+      console.log("Error deleting video:", error);
     }
   };
 
@@ -174,37 +196,45 @@ const ChannelPage = () => {
             </div>
 
             {/* videos section */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-3 w-full">
               {videoArr.length > 0 ? (
-                videoArr.map((video) => (
-                  <>
-                      <div
-                        key={video.id}
+               videoArr.map((video) => {
+                
+                return (
+                    <div
+                        key={video._id}
                         className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
-                      >
+                    >
                         {/* video thumbnail */}
                         <div className="w-full h-40 sm:h-48 bg-gray-200 rounded-lg overflow-hidden">
-                          {video.thumbnail && (
-                            <img
-                              src={video.thumbnail}
-                              alt={video.title}
-                              className="w-full h-full object-cover"
-                            />
-                          )}
+                            {video.thumbnailUrl && (
+                                <img
+                                    src={video.thumbnailUrl}
+                                    alt={video.title}
+                                    className="w-full h-full object-cover"
+                                />
+                            )}
                         </div>
                         {/* video details */}
                         <div className="mt-4">
-                          <h2 className="text-lg font-bold">{video.title}</h2>
-                          <p className="text-gray-600 text-sm">
-                            {video.description}
-                          </p>
-                          <p className="text-gray-400 text-sm mt-2">
-                            Uploaded by: {video.uploader}
-                          </p>
+                            <h2 className="text-lg font-bold">{video.title}</h2>
+                            <p className="text-gray-600 text-sm">
+                                {video.description}
+                            </p>
+                            <p className="text-gray-400 text-sm mt-2">
+                                Uploaded by: {video.uploader}
+                            </p>
+                            <button 
+                                onClick={() => deleteVideo(video.videoId)} 
+                                className="mt-2 bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700 transition-colors"
+                            >
+                                Delete
+                            </button>
                         </div>
-                      </div>
-                  </>
-                ))
+                    </div>
+                );
+
+              })
               ) : (
                 <>
                   {/* upload video */}
@@ -213,25 +243,24 @@ const ChannelPage = () => {
                     className="flex flex-col items-center gap-2 pr-2 "
                   >
                     <p>No videos found</p>
-                    <label for="file" className="custum-file-upload">
+                    <label htmlFor="file" className="custum-file-upload">
                       {/* upload icon */}
                       <div className="icon">
                         <svg
                           viewBox="0 0 24 24"
-                          fill=""
                           xmlns="http://www.w3.org/2000/svg"
                         >
-                          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                          <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                           <g
                             id="SVGRepo_tracerCarrier"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           ></g>
                           <g id="SVGRepo_iconCarrier">
                             {" "}
                             <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
+                              fillRule="evenodd"
+                              clipRule="evenodd"
                               d="M10 1C9.73478 1 9.48043 1.10536 9.29289 1.29289L3.29289 7.29289C3.10536 7.48043 3 7.73478 3 8V20C3 21.6569 4.34315 23 6 23H7C7.55228 23 8 22.5523 8 22C8 21.4477 7.55228 21 7 21H6C5.44772 21 5 20.5523 5 20V9H10C10.5523 9 11 8.55228 11 8V3H18C18.5523 3 19 3.44772 19 4V9C19 9.55228 19.4477 10 20 10C20.5523 10 21 9.55228 21 9V4C21 2.34315 19.6569 1 18 1H10ZM9 7H6.41421L9 4.41421V7ZM14 15.5C14 14.1193 15.1193 13 16.5 13C17.8807 13 19 14.1193 19 15.5V16V17H20C21.1046 17 22 17.8954 22 19C22 20.1046 21.1046 21 20 21H13C11.8954 21 11 20.1046 11 19C11 17.8954 11.8954 17 13 17H14V16V15.5ZM16.5 11C14.142 11 12.2076 12.8136 12.0156 15.122C10.2825 15.5606 9 17.1305 9 19C9 21.2091 10.7909 23 13 23H20C22.2091 23 24 21.2091 24 19C24 17.1305 22.7175 15.5606 20.9844 15.122C20.7924 12.8136 18.858 11 16.5 11Z"
                               fill=""
                             ></path>{" "}
@@ -257,6 +286,12 @@ const ChannelPage = () => {
                   </form>
                 </>
               )}
+
+            {videoArr.length > 0 && (
+              <div className=" m-auto relative">
+                <AddFileButton submitHandler={onSubmitHandler} onChangeHandler={onChangeHandler} fileName={videoFile}/>
+              </div>
+            )}
             </div>
           </div>
         </>

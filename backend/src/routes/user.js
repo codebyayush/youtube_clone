@@ -24,6 +24,7 @@ import {
 import {
   addVideosToChannel,
   createChannel,
+  deleteVideoFromChannel,
   fetchChannel,
   getVideosByChannelId,
 } from "../controllers/channel.js";
@@ -32,7 +33,9 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
+
 const router = Router();
+
 
 //ROUTES to add and remove all videos from youtube api in the channel, comment and video schemas
 router.route("/fetchAndPushVideos").get(fetchDataFromYoutubeAndPushToDb);
@@ -40,6 +43,8 @@ router.route("/fetchAndPushVideos").delete(deleteAllVideosAndComments);
 
 //ROUTE to fetchVideos from the database
 router.route("/fetchAllVideos").get(fetchVideos);
+
+
 
 //Authentication ROUTES
 // creating a new user
@@ -74,6 +79,7 @@ router.route("/deleteComment/:commentId").delete(requireAuth, deleteComment);
 router.route("/likeVideo/:videoId").put(requireAuth, likeVideo);
 //dislike route
 router.route("/dislikeVideo/:videoId").put(requireAuth, dislikeVideo);
+
 
 
 //Channel ROUTES
@@ -122,7 +128,7 @@ router.route("/addVideo/:channelId").post(
 //getting videos by channel ID
 router.route("/getVideos/:channelId").get(requireAuth, getVideosByChannelId);
 //delete a video from channel
-//router.route("/deleteVideo/:videoId").delete(requireAuth, deleteVideoFromChannel);
+router.route("/deleteVideo/:videoId").delete(requireAuth, deleteVideoFromChannel);
 
 
 export default router;
