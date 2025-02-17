@@ -1,4 +1,8 @@
 This is a youtube clone- Yoututor
+
+github repository-- https://github.com/codebyayush/youtube_clone/
+
+
 NOTE- I have fetched videos from the youtube API and saved them in the yoututor database manually first, using thunderclient extension.
 using this API---    router.route("/fetchAndPushVideos").get(fetchDataFromYoutubeAndPushToDb);
 
